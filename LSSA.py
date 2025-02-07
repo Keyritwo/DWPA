@@ -237,7 +237,9 @@ class Layout:
     def input_and_layout(self, wolf):
         part_set = wolf.part_set
         parts = self.part_id_turn_to_set(part_set, wolf.pos)
-        while parts:
+        max_attempts = 1000
+        attempt = 0
+        while parts and attempt < max_attempts:
             self.find_lowest_line()
             lowest_line_width = self.cal_line_width(self.lowest_line)
             "计算当前的maxlength 与 lowest_line_width"
@@ -277,6 +279,10 @@ class Layout:
                     continue
             if not flag:
                 self.enhance_line(self.lowest_line_index)
+            attempt += 1
+        if attempt >= max_attempts:
+            print("布局失败：达到最大尝试次数")
+            return
 
     # 画图
     @staticmethod
