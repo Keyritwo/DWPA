@@ -6,14 +6,35 @@ import LSSA
 import DWPA
 import copy
 
-# main()
+
+
+def main_nesting(wolfpack):
+
+    # 探狼游走
+    flag_generate_head_wolf = 0
+    while True:
+        for wolf in wolfpack.wolfs:
+            if wolfpack.wander_behavior(wolf):
+                flag_generate_head_wolf = 1
+        if flag_generate_head_wolf == 1:
+            break
+    # 头狼召唤
+    wolfpack.summon()
+    # 狼群围攻
+    wolfpack.seige_behavior()
+    # 将狼的信息转化成有序零件序列
+    head_wolf = wolfpack.head_wolf
+    # 结果
+    result = copy.deepcopy(head_wolf.result)
+    del wolfpack
+    return [result, head_wolf.used_ratio]
+
+
 if __name__ == "__main__":
-    # 板材大小
+    parts = []
+    parts_size = [[500, 300]]
     sheet_width = 1400
     sheet_height = 3500
-    parts_size = [[454, 954], [454, 954], [504, 942], [442, 979], [534, 1089], [410, 142], [410, 142], [410, 142],
-                  [410, 142], [410, 142], [409, 976], [409, 976], [409, 976]]
-    parts = []
     "优先将最大面积的零件放进去"
     # 按面积由大到小排序
     _parts_size = sorted(parts_size, key=lambda x: x[0] * x[1], reverse=True)
@@ -25,7 +46,7 @@ if __name__ == "__main__":
         parts.append(LSSA.Parts(_parts_size[id][0], _parts_size[id][1], ids[id]))
     # 设定狼群参数
     "狼的个数：m"
-    m = 50
+    m = 10
     # 游走距离因子 要小于 1
     w_0 = 0.5
     # 召唤距离因子
@@ -33,7 +54,8 @@ if __name__ == "__main__":
     # 攻击距离因子
     w_2 = 1
     # N ：零件个数
-    n = 13
+    # UI界面要改这个参数
+    n = len(parts_size)
     # 最大迭代次数 K
     k = 100
     # 探索方向

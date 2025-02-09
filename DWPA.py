@@ -43,6 +43,9 @@ class Wolf:
         self.result = result
         # 利用率
         self.used_ratio = used_ratio
+
+    def __del__(self):
+        del self.pos,self.N,self.ID,self.value,self.part_set,self.wolfpack,self.result,self.used_ratio
     # 游走算子
     "T(X_i, Q, S)"
     "Q = [0, 1, ... N-1]"
@@ -118,9 +121,9 @@ class Wolfpack:
     # 狼群初始化
     def __init__(self, _m, _n, head_wolf,
                  w_0, w_1, w_2, k, h, theta,  sheet_width, sheet_height,
-                 sigma, wolfs=[], q=[]):
+                 sigma):
         # 狼群矩阵
-        self.wolfs = wolfs
+        self.wolfs = []
         # 狼群规模 M
         self.M = _m
         # 只狼位置序列维数（零件个数）N
@@ -140,16 +143,24 @@ class Wolfpack:
         # 狼群更新比例 theta
         self.theta = theta
         # 单狼索引列表Q
-        self.Q = q
+        self.Q = []
         # 板材数据
         self.sheet_width = sheet_width
         self.sheet_height = sheet_height
         # 优先级比例权重
         self.sigma = sigma
 
+    def __del__(self):
+        del self.wolfs,self.M,self.N,self.head_wolf,self.step_wander
+        del self.step_summon,self.step_attack,self.K_max,self.H_max
+        del self.theta,self.Q,self.sheet_width,self.sheet_height
+        del self.sigma
+
     # 随机化狼群矩阵
     def randomization(self, part_set):
         # id 以0开头
+        if self.M is None:
+            return
         for i in range(self.M):
             # 生产 1 到 N 的随机序列
             "随机生成狼"
@@ -195,7 +206,7 @@ class Wolfpack:
             Wolf.wander(new_wolf, self.Q, step_a)
             y_i = new_wolf.value
             "发生头狼转换，立刻交换头狼"
-            if y_i > self.head_wolf.value:
+            if y_i >= self.head_wolf.value:
                 # 如果新狼评价值高于头狼，那么更新头狼
                 wolf = new_wolf
                 self.update_head_wolf(wolf)
@@ -221,6 +232,8 @@ class Wolfpack:
     # 召唤行为
     "返回布尔变量值，召唤是否成功"
     def summon(self):
+        # 极限奔袭次数
+        max_raidtimes = 100
         # 建立头狼别名
         head_wolf = self.head_wolf
         # 游走步长
@@ -229,10 +242,14 @@ class Wolfpack:
         d_near = math.ceil(self.N * self.step_summon)
         # 计数器 times
         times = 0
+        while2_conters = 0
         end_flag = 0
         # do...while
         "while 2"
         while True:
+            while2_conters += 1
+            if while2_conters >= max_raidtimes:
+                break
             "while 1"
             while True:
                 # 一次奔袭 (summon 1)
@@ -254,7 +271,7 @@ class Wolfpack:
                     # 如果 y_i > y_lead 那么实时地将奔袭之后的猛狼改为头狼
                     y_i = wolf.value
                     y_lead = head_wolf.value
-                    if y_i > y_lead:
+                    if y_i > y_lead or times >= max_raidtimes:
                         # 注意 ，更新操作只更新个头狼ID
                         self.update_head_wolf(wolf)
                         flag = 1
@@ -286,7 +303,7 @@ class Wolfpack:
                                 l1.append(i)
                                 l2.append(head_wolf.pos[i])
                         Wolf.raid(wolf, l1, l2, distance-d_near)
-                        if wolf.value > head_wolf.value:
+                        if wolf.value >= head_wolf.value:
                             self.update_head_wolf(wolf)
                             end_while_2_flag = 1
                             # break for : **
@@ -315,5 +332,5 @@ class Wolfpack:
                         l1.append(i)
                         l2.append(head_wolf.pos[i])
                 wolf.raid(wolf, l1, l2, step_c)
-            if wolf.value > head_wolf.value:
+            if wolf.value >= head_wolf.value:
                 self.update_head_wolf(wolf)
