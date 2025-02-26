@@ -1,5 +1,5 @@
 ## 基于狼群算法的排样程序
 运行需要在虚拟环境中安装pyside6
 **运行界面展示：**
-![界面展示](./images/1750.jpg)
-![布局展示](./images/1750layout.jpg)
+![界面展示](./images/1750.png)
+![布局展示](./images/1750layout.png)
