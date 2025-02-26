@@ -7,7 +7,6 @@ import DWPA
 import copy
 
 
-
 def main_nesting(wolfpack):
 
     # 探狼游走
@@ -27,7 +26,7 @@ def main_nesting(wolfpack):
     # 结果
     result = copy.deepcopy(head_wolf.result)
     del wolfpack
-    return [result, head_wolf.used_ratio]
+    return [result, head_wolf.used_ratio, head_wolf.max_line_height]
 
 
 if __name__ == "__main__":

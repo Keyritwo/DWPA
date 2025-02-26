@@ -6,19 +6,19 @@ import math
 
 import LSSA
 import random
+import time
+
+
+# 使用高精度时间作为种子
+def generate_unique_random_sequence(a, b, length):
+    random.seed(time.perf_counter_ns())  # 纳秒级时间戳
+    return random.sample(range(a, b+1), length)
 
 
 # 交换列表两元素位置
 def swap_positions(list, pos1, pos2):
     list[pos1], list[pos2] = list[pos2], list[pos1]
     return list
-
-
-# 生成随机序列函数
-def generate_unique_random_sequence(start, end, length):
-    if length > (end - start + 1):
-        raise ValueError("Length is greater than the range of numbers")
-    return random.sample(range(start, end + 1), length)
 
 
 class Wolf:
@@ -43,6 +43,10 @@ class Wolf:
         self.result = result
         # 利用率
         self.used_ratio = used_ratio
+        # 最高水平线高度
+        self.max_line_height = None
+        # 狼所对应的布局对象
+        self.layout = None
 
     def __del__(self):
         del self.pos,self.N,self.ID,self.value,self.part_set,self.wolfpack,self.result,self.used_ratio
@@ -158,6 +162,7 @@ class Wolfpack:
 
     # 随机化狼群矩阵
     def randomization(self, part_set):
+        # part_set的形式是 list[ class Parts ]
         # id 以0开头
         if self.M is None:
             return
